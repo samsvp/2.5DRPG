@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
 public class Player : Character
 {
 
@@ -65,7 +66,7 @@ public class Player : Character
         }
         else
         {
-            // Jump();
+            Jump();
             Move();
         }
         
