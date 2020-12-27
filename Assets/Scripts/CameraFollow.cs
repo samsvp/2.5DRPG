@@ -6,6 +6,7 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
     private Player player;
+    private static float initialX;
     private static float initialZ;
     public static float targetZ;
     public static bool followZ = false;
@@ -17,6 +18,7 @@ public class CameraFollow : MonoBehaviour
     void Start()
     {
         player = Player.instance;
+        initialX = transform.position.x;
         initialZ = transform.position.z;
         targetZ = transform.position.z;
     }
@@ -24,11 +26,11 @@ public class CameraFollow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float x = player.transform.position.x;
-        float zSpeed = 5 * Time.deltaTime;
+        float speed = 5 * Time.deltaTime;
+        float x = Mathf.Lerp(transform.position.x, initialX + player.transform.position.x, speed);
         float z = followZ ?
-            Mathf.Lerp(transform.position.z, initialZ + player.transform.position.z, zSpeed) :
-            Mathf.Lerp(transform.position.z, targetZ, zSpeed);
+            Mathf.Lerp(transform.position.z, initialZ + player.transform.position.z, speed) :
+            Mathf.Lerp(transform.position.z, targetZ, speed);
         transform.position = new Vector3(x, transform.position.y, z);
     }
 #pragma warning restore IDE0051 // Remove unused private members
