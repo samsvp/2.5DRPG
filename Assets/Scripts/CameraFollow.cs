@@ -6,8 +6,10 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
     private Player player;
-    private static float initialX;
+    public static float initialX;
+    public static float initialY;
     private static float initialZ;
+    private float initialPlayerY;
     public static float targetZ;
     public static bool followZ = false;
 
@@ -18,7 +20,9 @@ public class CameraFollow : MonoBehaviour
     void Start()
     {
         player = Player.instance;
+        initialPlayerY = player.transform.position.y;
         initialX = transform.position.x;
+        initialY = transform.position.y;
         initialZ = transform.position.z;
         targetZ = transform.position.z;
     }
@@ -28,10 +32,13 @@ public class CameraFollow : MonoBehaviour
     {
         float speed = 5 * Time.deltaTime;
         float x = Mathf.Lerp(transform.position.x, initialX + player.transform.position.x, speed);
+        float y = player.CharacterController.isGrounded && !CameraProjectionChange.isChanging ?
+            Mathf.Lerp(transform.position.y, initialY - initialPlayerY + player.transform.position.y, speed) :
+            transform.position.y;
         float z = followZ ?
             Mathf.Lerp(transform.position.z, initialZ + player.transform.position.z, speed) :
             Mathf.Lerp(transform.position.z, targetZ, speed);
-        transform.position = new Vector3(x, transform.position.y, z);
+        transform.position = new Vector3(x, y, z);
     }
 #pragma warning restore IDE0051 // Remove unused private members
 

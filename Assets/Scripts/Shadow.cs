@@ -5,17 +5,25 @@ using UnityEngine;
 
 public class Shadow : MonoBehaviour
 {
-    private float initialY;
-    // Start is called before the first frame update
+    public float offset = 0.1f;
+    public LayerMask _layerMask;
+    private float lastY;
+    private SpriteRenderer sr;
+
     void Start()
     {
-        initialY = transform.position.y;
+        sr = GetComponent<SpriteRenderer>();
+        lastY = transform.position.y;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Vector3 pos = new Vector3(transform.position.x, initialY, transform.position.z);
-        transform.position = pos;
+        Ray ray = new Ray(transform.parent.position, -Vector3.up);
+        RaycastHit hitInfo;
+        if (Physics.Raycast(ray, out hitInfo, 1000f, _layerMask)) lastY = hitInfo.point.y + offset;
+
+        transform.position = new Vector3(transform.position.x, lastY, transform.position.z);
+        sr.enabled = !CameraProjectionChange.isCamera2D;
     }
+
 }

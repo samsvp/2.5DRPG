@@ -12,6 +12,9 @@ public class CameraProjectionChange : MonoBehaviour
 
     private static List<Action<float, bool>> callbacks = new List<Action<float, bool>>();
 
+    public static float target3DYPos = 13f;
+    public static float target2DYPos = 6f;
+
 #pragma warning disable IDE0051 // Remove unused private members
     void Update()
     {
@@ -26,7 +29,7 @@ public class CameraProjectionChange : MonoBehaviour
         foreach (var callback in callbacks) callback(speed, !isCamera2D);
 
         float tol = 0.05f;
-        float targetYPos = isCamera2D ? 8 : 0;
+        float targetYPos = isCamera2D ? target3DYPos : target2DYPos;
         Quaternion targetRot = isCamera2D ? 
             new Quaternion(0.2588192f, 0, 0, 0.9659258f) : // euler: x=30, y=0, z=0
             new Quaternion(-0.0348995f, 0, 0, 0.9993908f); // euler: x=-4, y=0, z=0
@@ -46,6 +49,7 @@ public class CameraProjectionChange : MonoBehaviour
 
         isChanging = false;
         isCamera2D = !isCamera2D;
+        CameraFollow.initialY = isCamera2D ? target2DYPos : target3DYPos;
     }
 
     public static void AddCallback(Action<float, bool> callback)

@@ -25,13 +25,14 @@ public class Player : Character
             // if (value != null) enemy.TakeDamage(1000);
         } 
     }
-    
+
     // Movement
     private CharacterController characterController;
+    public CharacterController CharacterController { get => characterController; }
 
     private float verticalVelocity = 0;
-    private float gravity = 14.8f;
-    private float jumpForce = 8;
+    private float gravity = 11.8f;
+    private float jumpForce = 10;
 
     // Item
     public static Transform itemSlot;
