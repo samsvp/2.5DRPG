@@ -47,7 +47,7 @@ public abstract class Character : MonoBehaviour
     /// </summary>
     /// <param name="x"></param>
     /// <param name="z"></param>
-    protected void WalkAnimation(int x, int z)
+    public void WalkAnimation(int x, int z)
     {
         SetAllAnimMoveFalse();
 

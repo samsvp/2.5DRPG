@@ -6,12 +6,25 @@ using UnityEngine;
 
 public class CameraProjectionChange : MonoBehaviour
 {
-    public Camera mainCamera;
+    private Camera mainCamera;
     public static bool isChanging = false;
     public static bool isCamera2D = false;
     public static readonly float speed = 5;
 
-    private static List<Action<float, bool>> callbacks = new List<Action<float, bool>>();
+    [SerializeField]
+    private PositionProj positionProj;
+    // Used to align the player with the non movement axis "x" or "z"
+    // Leave as 0 to not align with any axis
+    [SerializeField]
+    private Vector3 playerAlignPos = Vector3.zero;
+
+    public enum MovementAxis
+    {
+        X,
+        Z
+    }
+    public MovementAxis movementAxis = MovementAxis.X;
+    public int movementDistance = 5;
 
 #pragma warning disable IDE0051 // Remove unused private members
     private void Start()
@@ -21,13 +34,32 @@ public class CameraProjectionChange : MonoBehaviour
 
     void Update()
     {
+#if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.LeftShift) && !CameraFollow.followZ)
             StartCoroutine(ChangeProjection());
+#endif
     }
 
     private void OnTriggerEnter(Collider col)
     {
-        if (col.CompareTag("Player")) StartCoroutine(ChangeProjection());
+        if (col.CompareTag("Player"))
+        {
+            StartCoroutine(ChangeProjection());
+            if (playerAlignPos == Vector3.zero) playerAlignPos = Player.instance.transform.position;
+            Vector3 pos = Player.instance.transform.position;
+            if (movementAxis == MovementAxis.X)
+            {
+                int direction = (int)Mathf.Sign(col.transform.position.x - transform.position.x);
+                Player.instance.transform.position = new Vector3(pos.x, pos.y, playerAlignPos.z);
+                Player.instance.ControlledMovement(direction, 0, movementDistance);
+            }
+            else if (movementAxis == MovementAxis.Z)
+            {
+                int direction = (int)Mathf.Sign(col.transform.position.z - transform.position.z);
+                Player.instance.transform.position = new Vector3(playerAlignPos.x, pos.y, pos.z);
+                Player.instance.ControlledMovement(0, direction, movementDistance);
+            }
+        }
     }
 #pragma warning restore IDE0051 // Remove unused private members
 
@@ -36,7 +68,9 @@ public class CameraProjectionChange : MonoBehaviour
         if (isChanging) yield break;
 
         isChanging = true;
-        foreach (var callback in callbacks) callback(speed, !isCamera2D);
+        Player.instance.canMove = false;
+        if (positionProj != null) positionProj.TriggerChange(speed, !isCamera2D);
+        else Debug.LogWarning("\"positionProj\" variable is null");
 
         float tol = 0.05f;
         float targetYPos = isCamera2D ? mainCamera.transform.position.y + 7 :
@@ -67,15 +101,8 @@ public class CameraProjectionChange : MonoBehaviour
         isCamera2D = !isCamera2D;
         // Change initial camera Y position depending on the current perspective
         CameraFollow.initialY = isCamera2D ? 6 : 13;
+
+        Player.instance.canMove = true;
     }
 
-    public static void AddCallback(Action<float, bool> callback)
-    {
-        callbacks.Add(callback);
-    }
-
-    public static void RemoveCallback(Action<float, bool> callback)
-    {
-        callbacks.Remove(callback);
-    }
 }

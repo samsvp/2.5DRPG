@@ -33,6 +33,8 @@ public class Player : Character
     private float verticalVelocity = 0;
     private float gravity = 11.8f;
     private float jumpForce = 10;
+    private bool isJumping = false;
+    public bool canMove = true;
 
     // Item
     public static Transform itemSlot;
@@ -59,7 +61,7 @@ public class Player : Character
     {
         base.Update();
         
-        if (CameraProjectionChange.isChanging) return;
+        if (!canMove) return;
 
         if (GameManager.instance.isInBattle)
         {
@@ -68,7 +70,7 @@ public class Player : Character
         else
         {
             Jump();
-            Move();
+            GetMoventInput();
         }
         
         ///DEBUG
@@ -84,18 +86,44 @@ public class Player : Character
 
     #region Movement
 
-    private void Move()
+    protected override void Move(int _x, int _z)
+    {
+        base.Move(_x, _z);
+        characterController.Move(new Vector3(x, verticalVelocity, z) * Time.deltaTime);
+    }
+
+    private void GetMoventInput()
     {
         // Only allow movement along the z axis if in 3D mode;
         int _x = (int)Input.GetAxisRaw("Horizontal");
         int _z = CameraProjectionChange.isCamera2D ? 0 : (int)Input.GetAxisRaw("Vertical");
+        Move(_x, _z);
+    }
 
-        x = _x * speed;
-        z = _z * speed; 
+    /// <summary>
+    /// Function to control the player movement from another script
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="z"></param>
+    public void ControlledMovement(int x, int z, float distance)
+    {
+        StartCoroutine(IControlledMovement(x, z, distance));
+    }
 
-        WalkAnimation(_x, _z);
-
-        characterController.Move(new Vector3(x, verticalVelocity, z) * Time.deltaTime);
+    public IEnumerator IControlledMovement(int x, int z, float distance)
+    {
+        canMove = false;
+        float travelledDistance = 0f;
+        int _x = x != 0 ? (int)Mathf.Sign(x) : x;
+        int _z = z != 0 ? (int)Mathf.Sign(z) : z;
+        while (travelledDistance < distance)
+        {
+            Vector3 lastPos = transform.position;
+            Move(_x, _z);
+            travelledDistance += Vector3.Distance(lastPos, transform.position);
+            yield return null;
+        }
+        canMove = true;
     }
 
     private void Jump()
@@ -103,9 +131,27 @@ public class Player : Character
         if (characterController.isGrounded)
         {
             verticalVelocity = -gravity * Time.deltaTime;
-            if (Input.GetKey(KeyCode.Space)) verticalVelocity = jumpForce;
+            if (Input.GetKey(KeyCode.Space))
+            {
+                verticalVelocity = jumpForce;
+                isJumping = true;
+            }
+            else if (isJumping)
+            {
+                isJumping = false;
+            }
         }
-        else verticalVelocity -= gravity * Time.deltaTime;
+        else
+        {
+            verticalVelocity -= gravity * Time.deltaTime;
+            if (!isJumping)
+            {
+                // Snap the player to the ground
+                RaycastHit hitInfo = new RaycastHit();
+                if (Physics.Raycast(new Ray(transform.position, Vector3.down), out hitInfo, float.PositiveInfinity))
+                    characterController.Move(hitInfo.point - transform.position);
+            }
+        }
     }
 
     #endregion
