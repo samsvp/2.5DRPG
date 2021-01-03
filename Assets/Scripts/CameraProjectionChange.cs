@@ -51,7 +51,8 @@ public class CameraProjectionChange : MonoBehaviour
             {
                 int direction = (int)Mathf.Sign(col.transform.position.x - transform.position.x);
                 Player.instance.transform.position = new Vector3(pos.x, pos.y, playerAlignPos.z);
-                Player.instance.ControlledMovement(direction, 0, movementDistance);
+                Player.instance.ControlledMovement(-direction, 0, movementDistance);
+                Player.instance.lastZ = playerAlignPos.z;
             }
             else if (movementAxis == MovementAxis.Z)
             {
@@ -79,7 +80,6 @@ public class CameraProjectionChange : MonoBehaviour
             new Quaternion(0.2588192f, 0, 0, 0.9659258f) : // euler: x=30, y=0, z=0
             new Quaternion(-0.0348995f, 0, 0, 0.9993908f); // euler: x=-4, y=0, z=0
         float targetEulerXRot = isCamera2D ? 30 : 356; // 356 = -4 degrees
-        print(targetYPos);
         while (Mathf.Abs(mainCamera.transform.position.y - targetYPos) > tol * 2 ||
                Mathf.Abs(mainCamera.transform.eulerAngles.x - targetEulerXRot) > tol)
         {

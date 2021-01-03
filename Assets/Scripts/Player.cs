@@ -35,6 +35,7 @@ public class Player : Character
     private float jumpForce = 10;
     private bool isJumping = false;
     public bool canMove = true;
+    public float lastZ = 0;
 
     // Item
     public static Transform itemSlot;
@@ -71,6 +72,8 @@ public class Player : Character
         {
             Jump();
             GetMoventInput();
+            if (CameraProjectionChange.isCamera2D)
+                transform.position = new Vector3(transform.position.x, transform.position.y, lastZ);
         }
         
         ///DEBUG

@@ -5,27 +5,24 @@ using UnityEngine;
 
 public class PositionProj : MonoBehaviour
 {
-    /// <summary>
-    /// TODO: 
-    /// RESET TRANSFORM POSITION
-    /// WHEN SWITCHING BACK
-    /// TO 3D
-    /// </summary>
-
-
-
     [SerializeField]
     private List<Transform> transformsChangeZ = new List<Transform>();
     [SerializeField]
     private List<float> targetZs = new List<float>();
 
-    private float lastZ;
+    // Dictionary to hold transforms and their original Z position
+    private static Dictionary<Transform, float> transformsDict = new Dictionary<Transform, float>();
+
 #pragma warning disable IDE0051 // Remove unused private members
     // Start is called before the first frame update
     void Start()
     {
         if (transformsChangeZ.Count != targetZs.Count) 
             throw new System.Exception("Not enough Z position targets");
+
+        for (int i = 0; i < transformsChangeZ.Count; i++)
+            if(!transformsDict.ContainsKey(transformsChangeZ[i])) 
+                transformsDict.Add(transformsChangeZ[i], transformsChangeZ[i].position.z);
     }
 
 #pragma warning restore IDE0051 // Remove unused private members
@@ -48,23 +45,18 @@ public class PositionProj : MonoBehaviour
 
     private void ChangeZPosition(Transform t, float z, float speed, bool changeTo2D)
     {
-        if (Mathf.Abs(transform.position.z - Player.instance.transform.position.z) > 5.5f) 
-            return;
-
-        float targetZ = lastZ;
-        if (changeTo2D)
-        {
-            targetZ = z;
-            lastZ = transform.position.z;
-        }
+        float targetZ = changeTo2D ? z : transformsDict[t];
         StartCoroutine(IChangeZPosition(t, targetZ, speed));
     }
 
     public void TriggerChange(float speed, bool changeTo2D)
     {
-        for (int i = 0; i < transformsChangeZ.Count; i++)
-        {
-            ChangeZPosition(transformsChangeZ[i], targetZs[i], speed, changeTo2D);
-        }
+        if (changeTo2D)
+            for (int i = 0; i < transformsChangeZ.Count; i++)
+                StartCoroutine(IChangeZPosition(transformsChangeZ[i], targetZs[i], speed));
+        else
+            foreach (KeyValuePair<Transform, float> kvPair in transformsDict)
+                StartCoroutine(IChangeZPosition(kvPair.Key, kvPair.Value, speed));
     }
+
 }
