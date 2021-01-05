@@ -10,8 +10,7 @@ public class GrabbableObject : Interactable
      */
     private bool canHold = true;
     private Transform playerItemSlot;
-
-    private Sprite sprite;
+    private Transform parent;
     
     private Rigidbody rb;
 
@@ -21,8 +20,8 @@ public class GrabbableObject : Interactable
     {
         base.Start();
         rb = GetComponent<Rigidbody>();
-        sprite = GetComponent<SpriteRenderer>().sprite;
 
+        parent = transform.parent;
         playerItemSlot = Player.itemSlot;
     }
 
@@ -30,11 +29,15 @@ public class GrabbableObject : Interactable
     protected override void Update()
     {
         base.Update();
-    }
-
-    void OnCollisionEnter(Collision col)
-    {
-        if (col.transform.CompareTag("Ground")) canHold = true;
+        if (transform.parent == playerItemSlot)
+        {
+            if (Player.instance.facingDirection == "right")
+                transform.position = new Vector3(playerItemSlot.position.x + 1.5f,
+                    transform.position.y, transform.position.z);
+            else
+                transform.position = new Vector3(playerItemSlot.position.x - 1.5f,
+                    transform.position.y, transform.position.z);
+        }
     }
 #pragma warning restore IDE0051 // Remove unused private members
 
@@ -46,11 +49,14 @@ public class GrabbableObject : Interactable
             transform.localPosition = new Vector3(transform.localPosition.x, 0.25f,
                                                     transform.localPosition.z);
             rb.useGravity = false;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
             canHold = false;
         }
-        else if (!canHold)
+        else if (!canHold && transform.parent != null)
         {
-            transform.parent = null;
+            transform.parent = parent;
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
+            canHold = true;
             rb.useGravity = true;
         }
     }

@@ -20,7 +20,7 @@ public class Shadow : MonoBehaviour
     {
         Ray ray = new Ray(transform.parent.position, -Vector3.up);
         RaycastHit hitInfo;
-        if (Physics.Raycast(ray, out hitInfo, 1000f, _layerMask)) lastY = hitInfo.point.y + offset;
+        if (Physics.Raycast(ray, out hitInfo, float.PositiveInfinity, _layerMask)) lastY = hitInfo.point.y + offset;
 
         transform.position = new Vector3(transform.position.x, lastY, transform.position.z);
         sr.enabled = !CameraProjectionChange.isCamera2D;

@@ -13,6 +13,7 @@ public abstract class Character : MonoBehaviour
     [SerializeField]
     protected float speed;
     protected float x, z;
+    public string facingDirection = "right";
 
     // Sprites and Animation
     protected Animator animator;
@@ -38,6 +39,8 @@ public abstract class Character : MonoBehaviour
     {
         x = _x * speed;
         z = _z * speed;
+
+        if (x != 0) facingDirection = x < 0 ? "left" : "right";
 
         WalkAnimation(_x, _z);
     }

@@ -13,17 +13,9 @@ public class CameraProjectionChange : MonoBehaviour
 
     [SerializeField]
     private PositionProj positionProj;
-    // Used to align the player with the non movement axis "x" or "z"
-    // Leave as 0 to not align with any axis
+    // Used to align the player with the z axis
     [SerializeField]
-    private Vector3 playerAlignPos = Vector3.zero;
-
-    public enum MovementAxis
-    {
-        X,
-        Z
-    }
-    public MovementAxis movementAxis = MovementAxis.X;
+    private float playerAlignZ;
     public int movementDistance = 5;
 
 #pragma warning disable IDE0051 // Remove unused private members
@@ -45,21 +37,11 @@ public class CameraProjectionChange : MonoBehaviour
         if (col.CompareTag("Player"))
         {
             StartCoroutine(ChangeProjection());
-            if (playerAlignPos == Vector3.zero) playerAlignPos = Player.instance.transform.position;
             Vector3 pos = Player.instance.transform.position;
-            if (movementAxis == MovementAxis.X)
-            {
-                int direction = (int)Mathf.Sign(col.transform.position.x - transform.position.x);
-                Player.instance.transform.position = new Vector3(pos.x, pos.y, playerAlignPos.z);
-                Player.instance.ControlledMovement(-direction, 0, movementDistance);
-                Player.instance.lastZ = playerAlignPos.z;
-            }
-            else if (movementAxis == MovementAxis.Z)
-            {
-                int direction = (int)Mathf.Sign(col.transform.position.z - transform.position.z);
-                Player.instance.transform.position = new Vector3(playerAlignPos.x, pos.y, pos.z);
-                Player.instance.ControlledMovement(0, direction, movementDistance);
-            }
+            int direction = (int)Mathf.Sign(col.transform.position.x - transform.position.x);
+            Player.instance.transform.position = new Vector3(pos.x, pos.y, playerAlignZ);
+            Player.instance.ControlledMovement(-direction, 0, movementDistance);
+            Player.instance.lastZ = playerAlignZ;
         }
     }
 #pragma warning restore IDE0051 // Remove unused private members

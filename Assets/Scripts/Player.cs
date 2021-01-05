@@ -152,7 +152,9 @@ public class Player : Character
                 // Snap the player to the ground
                 RaycastHit hitInfo = new RaycastHit();
                 if (Physics.Raycast(new Ray(transform.position, Vector3.down), out hitInfo, float.PositiveInfinity))
-                    characterController.Move(hitInfo.point - transform.position);
+                    if (Mathf.Abs(hitInfo.point.y - transform.position.y) < 3)
+                        characterController.Move(hitInfo.point - transform.position);
+                    else isJumping = true;
             }
         }
     }
