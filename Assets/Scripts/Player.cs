@@ -78,9 +78,6 @@ public class Player : Character
         
         ///DEBUG
 #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.LeftShift)) { }
-
-
         if (Input.GetKeyDown(KeyCode.R)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 #endif
         ///DEBUG
