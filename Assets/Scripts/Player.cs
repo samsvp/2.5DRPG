@@ -31,8 +31,10 @@ public class Player : Character
     public CharacterController CharacterController { get => characterController; }
 
     private float verticalVelocity = 0;
+    [SerializeField]
     private float gravity = 11.8f;
-    private float jumpForce = 10;
+    [SerializeField]
+    private float jumpForce = 18;
     private bool isJumping = false;
     public bool canMove = true;
     public float lastZ = 0;
@@ -143,7 +145,9 @@ public class Player : Character
         }
         else
         {
-            verticalVelocity -= gravity * Time.deltaTime;
+            float y = Mathf.Abs(verticalVelocity) > 1f ? 
+                Mathf.Pow(Mathf.Abs(verticalVelocity), 0.5f) : gravity;
+            verticalVelocity -= gravity * y * Time.deltaTime;
             if (!isJumping)
             {
                 // Snap the player to the ground
