@@ -54,7 +54,7 @@ public class GrabbableObject : Interactable
         }
         else if (!canHold && transform.parent != null)
         {
-            transform.parent = parent;
+            transform.parent = null;
             rb.constraints = RigidbodyConstraints.FreezeRotation;
             canHold = true;
             rb.useGravity = true;

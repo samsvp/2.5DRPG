@@ -32,7 +32,8 @@ public class CameraFollow : MonoBehaviour
     {
         float speed = 5 * Time.deltaTime;
         float x = Mathf.Lerp(transform.position.x, initialX + player.transform.position.x, speed);
-        float y = player.CharacterController.isGrounded && !CameraProjectionChange.isChanging ?
+        float y = (player.CharacterController.isGrounded || CameraProjectionChange.isCamera2D) &&
+                  !CameraProjectionChange.isChanging ?
             Mathf.Lerp(transform.position.y, initialY - initialPlayerY + player.transform.position.y, speed) :
             transform.position.y;
         float z = followZ ?

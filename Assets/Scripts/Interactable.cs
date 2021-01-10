@@ -20,12 +20,12 @@ public abstract class Interactable : MonoBehaviour
         if (isInRange && Input.GetKeyDown(KeyCode.E)) Interact();
     }
 
-    void OnTriggerEnter(Collider col)
+    protected virtual void OnTriggerEnter(Collider col)
     {
         if (col.transform.CompareTag("Player")) isInRange = true;
     }
 
-    void OnTriggerExit(Collider col)
+    protected virtual void OnTriggerExit(Collider col)
     {
         if (col.transform.CompareTag("Player")) isInRange = false;
     }
